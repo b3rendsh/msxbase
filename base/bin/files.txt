@@ -1,0 +1,11 @@
+Source:
+https://github.com/b3rendsh/msxbase
+
+Files:
+msx1_bios.bin	MSX1 BIOS binary
+msx1_basic.bin	MSX1 BASIC binary
+msx1_base.img	MSX1 BIOS/BASIC system rom
+msx2_bios.bin	MSX2 BIOS binary
+msx2_basic.bin	MSX2 BASIC binary
+msx2_base.img	MSX2 BIOS/BASIC system rom
+msx2_subrom.bin	MSX2 SUBROM binary
