@@ -14,6 +14,10 @@ Customized MSX system sources for retrocomputers with RomWBW HBIOS.
 
 Launch MSX BASIC and HBDOS (MSX-DOS 1 compatible) from CP/M.
 
+## Contributions
+
+Please create an issue if you want to report a bug or have any requests or suggestions. Pull requests from forks are currently not supported.
+
 ## License
 
 The baseline system sources are the creative work of ASCII and others. They are shared here for educational and non commercial purposes only. It is believed that these works are being used in accordance with the intentions and/or licensing of their creators.
