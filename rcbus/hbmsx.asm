@@ -1,12 +1,15 @@
 ; ------------------------------------------------------------------------------
 ; hbmsx.asm
-; HBDOS MSX DOS/BASIC loader
+; HBDOS MSX DOS/BASIC/ROM loader
 ;
 ; (C) 2025 All rights reserved. 
 ; ------------------------------------------------------------------------------
 
 		INCLUDE "base.inc"
 		INCLUDE	"hbmsx.inc"
+
+fcb		equ	$5c		; File Control Block
+buff		equ	$80		; DMA buffer
 		
 ; ------------------------------------------------------------------------------
 		
@@ -15,13 +18,17 @@
 		jp	main
 
 		db	13,10
-		db	"HBDOS MSX V0.1",13,10
+		db	"HBDOS MSX V0.2",13,10
 		db	26
 
 msx:          	INCBIN	"obj/bios.bin"
+	IF MSXBOOT = 2
+		INCBIN	"obj/init.bin"
+	ELSE
 		INCBIN	"obj/basic.bin"
 	IF MSXBOOT = 1
 		INCBIN	"obj/hbdos1__.bin"
+	ENDIF
 	ENDIF
 		
 main:		call	check_ident
@@ -44,9 +51,79 @@ main:		call	check_ident
 		ld	de,t_loading
 		ld	c,9
 		call	5
+		
+	IF MSXBOOT = 2
+		; open ROM file 
+		ld	de,fcb
+		ld	c,$0f		; FOPEN
+		call	5
+		ld	de,t_error
+		inc	a		; error opening file?
+		jp	z,err_exit	; z=yes
+		
+loop:		ld	de,fcb		; Read from file
+		ld	c,$14		; FREAD
+		call	5
+		or	a
+		jr	nz,eof		; Non-zero A return value means end of file
+
+		ld	hl,buff         ; Copy from DMA buffer to destination
+		ld	de,(dest)
+		ld	a,$c0-1
+		cp	d		; max 32K filesize reached?
+		jr	c,fsize		; c=yes
+		
+		ld	bc,$80
+		ldir
+		ld	(dest),de	; Increment next destination address
+		jr	loop
+		
+fsize:		ld	de,fcb		; Close the file
+		ld	c,$10		; FCLOSE
+		call	5
+		ld	de,t_notrom
+		jp	err_exit
+
+eof:		ld	de,fcb		; Close the file
+		ld	c,$10		; FCLOSE
+		call	5
+		
+		; check if it is a valid MSX ROM file
+		ld	de,t_notrom
+		ld	hl,$4000
+		ld	a,'A'
+		cp	(hl)
+		jp	nz,err_exit
+		inc	hl
+		ld	a,'B'
+		cp	(hl)
+		jp	nz,err_exit
+		inc	hl
+		inc	hl
+		ld	a,(hl)
+		cp	$40		; valid init address?
+		jp	c,err_exit
+		cp	$80		; relocate to $8000?
+		jr	c,runmsx	; c=no
+		cp	$c0		; valid init address
+		jp	nc,err_exit
+		
+		; relocate ROM data to $8000
+		ld	hl,$4000
+		ld	de,$8000
+		ld	bc,$4000
+		ldir
+		; clear $4000-$8000
+		ld	hl,$4000
+		ld	(hl),$00
+		ld	de,$4001
+		ld	bc,$3fff
+		ldir	
+	
+	ENDIF ; MSXBOOT
 
 runmsx:		di
-
+	
 		; load system rom	
 		ld	bc,main-msx
 		ld	hl,msx 
@@ -119,7 +196,14 @@ err_exit:	ld	c,9
 		call	5
 		ret
 
+	IF MSXBOOT = 2
+dest:		dw	$4000
+t_loading:	db	"MSX ROM loader for RomWBW...",13,10,"$"
+t_error:	db	"Error loading ROM file",13,10,"$"
+t_notrom:	db	"Error: invalid MSX ROM file",13,10,"$"
+	ELSE
 t_loading:	db	"Loading MSX for RomWBW...",13,10,"$"
+	ENDIF
 t_nohbios:	db	"Error: HBIOS not detected",13,10,"$"
 t_hbdos:	db	"Error: MSX already active",13,10,"$"
 t_intmode:	db	"Error: interrupt mode is 0",13,10,"$"

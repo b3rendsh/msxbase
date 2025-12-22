@@ -22,7 +22,7 @@ endif
 BASE := ../base
 
 
-all:	msx100 hbmsx rcmsx
+all:	msx100 hbmsx rcmsx msxrom
 
 rdate:
 	@echo db $(QUOTE)$(shell $(GETDATE))$(QUOTE) > rdate.inc
@@ -55,6 +55,14 @@ rcmsx:	rdate
 	z80asm -I$(BASE) -DRCMSX -b -l -m -Oobj -o=basic.bin basic.asm
 	z80asm -I$(BASE) -DRCMSX -b -l -m -Oobj hbmsx.asm -o=rcmsx.com
 	$(CP) obj$/rcmsx.com bin$/rcmsx.com
+	@echo done
+	
+msxrom:	rdate
+	@echo Assembling MSX ROM loader
+	z80asm -I$(BASE) -DMSXROM -b -l -m -Oobj -o=bios.bin bios.asm
+	z80asm -I$(BASE) -DMSXROM -b -l -m -Oobj -o=init.bin basic.asm
+	z80asm -I$(BASE) -DMSXROM -b -l -m -Oobj hbmsx.asm -o=msxrom.com
+	$(CP) obj$/msxrom.com bin$/msxrom.com
 	@echo done
 
 clean:

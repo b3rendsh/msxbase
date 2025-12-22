@@ -136,10 +136,41 @@ SYSHOOK		MACRO	H
 ; ------------------------------------------------------------------------------
 
 		PHASE	2680H
-		
+
 ; entrypoint for BASIC interpreter init
 INIENT:
 A2680:		jp	INIT
+
+	IF MSXBOOT = 2
+	
+; entrypoint for REBOOT
+SYNENT:
+A2683:		jp	REBOOT
+
+; init random value
+RNDINI:		LD	DE,I2D01
+		LD	HL,RNDX
+		LD	B,8
+C2EF7:		LD	A,(DE)
+		LD	(HL),A
+		INC	DE
+		INC	HL
+		DJNZ	C2EF7
+		RET
+I2D01:		DEFB	000H,040H,064H,096H,051H,037H,023H,058H		; 0.40649651372358		
+
+; stub: not required
+FINLPT:
+FINPRT:
+RESTOR:
+CLSALL:
+OMERR:
+INITRP:
+C6439:		ret
+
+		INCLUDE "custom/init.asm"
+		
+	ELSE ; MSXBOOT
 
 ; entrypoint for SYNCHR
 SYNENT:
@@ -9909,6 +9940,9 @@ J6275:		CALL	LINKER			; setup BASIC linelinks
 SCRATH:
 C6286:		RET	NZ			; not end of statement, quit (which will generate a syntax error)
 
+	ENDIF ; MSXBOOT
+; ------------------------------------------------------------------------------
+	
 ; Subroutine clear BASIC program
 SCRTCH:
 C6287:		LD	HL,(TXTTAB)
@@ -9995,6 +10029,9 @@ J62F0:		SYSHOOK	H_STKE
 GTMPRT:
 C6317:		LD	HL,(TEMP)
 		RET
+
+; ------------------------------------------------------------------------------
+	IF MSXBOOT != 2
 
 ; Subroutine enable trap
 ; Input:  HL = pointer to trap block
@@ -11864,7 +11901,6 @@ J6C02:		LD	A,(HL)
 
 	ENDIF ; OPTM
 
-
 ; Subroutine CLOSE statement
 CLOSE:
 C6C14:
@@ -11878,7 +11914,6 @@ C6C14:
 
 		ALIGN	6C1CH			; keep CLSALL at same entry point
 	ENDIF
-
 
 ; Subroutine close all I/O channels
 CLSALL:
@@ -11896,7 +11931,6 @@ C6C1C:		LD	A,(NLONLY)
 
 		ALIGN	6C2AH			; keep LFILES at same entry point
 	ENDIF
-
 
 ; Subroutine LFILES statement
 LFILES:
@@ -15289,6 +15323,9 @@ C7E4B:		RST	R_SYNCHR
 		CALL	CLEAR2			; initialize interpreter, BASIC pointer from TEMP
 		JP	NEWSTT			; execute new statement
 
+	ENDIF ; MSXBOOT
+; ------------------------------------------------------------------------------
+	
 ; Subroutine allocate I/O channels
 ; Input:  A = number of user I/O channels
 ALCFIL:
@@ -15380,7 +15417,9 @@ T7EFD:		DEFB	"Copyright 1983 by Microsoft",13,10
 I7F1B:		DEFB	" Bytes free"
 		DEFB	0
 
+; ------------------------------------------------------------------------------
 ; Initial Workarea variables
+
 I7F27:
 		DEPHASE
 		PHASE  VARWRK
@@ -15416,6 +15455,9 @@ CLPRIM: 	OUT	(0A8H),A		; update primary slot register
 
 CLPRM1: 	JP	(IX)
 
+	IF MSXBOOT = 2
+USRTAB:		defw	0,0,0,0,0,0,0,0,0,0
+	ELSE
 USRTAB: 	defw	FCERR			; illegal function call
 		defw	FCERR			; illegal function call
 		defw	FCERR			; illegal function call
@@ -15426,7 +15468,8 @@ USRTAB: 	defw	FCERR			; illegal function call
 		defw	FCERR			; illegal function call
 		defw	FCERR			; illegal function call
 		defw	FCERR			; illegal function call
-
+	ENDIF ; MSXBOOT
+	
 LINL40:
 	IFDEF HBIOS
 		defb	40
@@ -15517,6 +15560,10 @@ ASPCT2:		defw	00100H
 ENDPRG:		defb	':'
 
 		DEPHASE
+
+; ------------------------------------------------------------------------------
+	IF MSXBOOT != 2
+
 		PHASE	7FB7H
 
 	IF MSX2 || NDEVFIX
@@ -15591,7 +15638,7 @@ J7FE6:  	LD	(D_FFFF),A		; switch sec. slot page 0 (rombios gone!)
 		OUT	(0A8H),A		; restore primary slotregister
 		LD	A,E
 		RET
-		
+
 ; Subroutine CALSLT after Vertical Retrace
 C7FF5:		IN	A,(99H)
 		RLCA
@@ -15605,6 +15652,7 @@ C7FFD:		JP	BDOS
 	ENDIF ; MSX2
 		
 		ALIGN	8000H			; fill unused space with zero's
-
+	
 		DEPHASE
-		
+
+	ENDIF ; MSXBOOT

@@ -2,15 +2,18 @@
 
 MSX system software for retrocomputers with RomWBW HBIOS.
 
-The MSX BIOS and DOS are modified to work with HBIOS functions for disk, console, date/time and memory bank switching. BASIC graphics commands and full screen editor use direct TMS videocard i/o. BASIC sound commands use direct AY-3-8910 PSG i/o.
+The MSX BIOS and DOS are modified to work with HBIOS functions for disk, console, date/time and memory bank switching. 
+
+BASIC graphics commands and the full screen editor use direct TMS videocard i/o via the MSX BIOS.  
+BASIC sound commands use direct AY-3-8910 PSG i/o via the MSX BIOS.
 
 The i/o ports and other settings can be configured in a build configuration file.
 
 ## Hardware requirements
 
-HBDOS can be used on a Z80 or Z180 RomWBW compatible computer that supports a system timer.
+HBDOS can be used on a Z80 or Z180 RomWBW compatible computer with at least 192KB RAM and support for a system timer.
 
-MSX BASIC requires a TMS9918A compatible video card.
+MSX BASIC and the MSX ROM loader require a TMS9918A compatible video card, system timer and 128KB RAM.
 
 ## Usage
 
@@ -20,7 +23,9 @@ Prebuilt binaries with default options are available in the bin folder.
 
 Copy COMMAND.COM to the root directory of the first FAT12/FAT16 partition on the disk.
 
-Start hbmsx.com or rcmsx.com from RomWBW CP/M.
+Start hbmsx.com or rcmsx.com from RomWBW CP/M to load HBDOS / Disk BASIC.
+
+Start msxrom.com from RomWBW CP/M to load a MSX (game) ROM image e.g. "msxrom arkanoid.rom".
 
 ## HBDOS
 
@@ -43,6 +48,14 @@ If the MSXBOOT build option is set to 0 then only MSX BASIC will be loaded, DOS 
 Use the IPL command to return to RomWBW i.e. do a cold reboot.
 
 In Disk BASIC use "call system" to return to the DOS command prompt.
+
+## ROM CART
+
+The MSX ROM loader supports MSX ROM cartridge images of maximum 32KB.
+
+Not all MSX ROM games will work and some games may require an additional ROM patch or additional hardware.
+
+When a MSX ROM is running you can reboot RomWBW by pressing the CTRL+STOP key (default mapped to CTRL+V).
 
 ## Console
 

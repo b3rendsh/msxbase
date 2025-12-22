@@ -55,6 +55,17 @@ C7C76:		LD	SP,VARWRK-10		; temporary stack
 		CALL	INITIO			; initialize I/O devices (PSG and LPT)
 		call	INIT32			; screen 1
 		call	CLRSPR			; clear sprites
+	IF MSXBOOT = 2
+		; Run ROM
+		ld	hl,($4002)
+		ld	a,h
+		or	l
+		jr	nz,jprom
+		ld	hl,($8002)
+jprom:		call	CLPRM1+1		; call (hl)
+		jp	REBOOT			; reboot RomWBW on return from ROM as a fail safe
+	ELSE
+		; Run BASIC/DOS
 		ld	hl,00A0BH
 		ld	(CSRY),hl		; cursor at 10,11
 		ld	hl,T7ED8
@@ -122,6 +133,8 @@ M7D31:		ld	hl,T7EF2
 		LD	HL,I7F1B
 		JP	STROUT			; message to interpreter output
 
+	ENDIF ; MSXBOOT
+		
 ; Subroutine search for start of ram 0EFFFH - 08000H area (downwards)
 C7D5D:		LD	HL,0EF00H
 J7D60:		LD	A,(HL)
@@ -153,6 +166,6 @@ REBOOT:		di
 		ld	c,BF_SYSRES_COLD
 		call	HB_INVOKE		; never return
 		jr	$			
-		
+
 
 INITSIZE	EQU	$-INIT

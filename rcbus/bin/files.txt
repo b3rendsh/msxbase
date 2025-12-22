@@ -5,4 +5,5 @@ Files:
 msx1_base.img	MSX1 BIOS/BASIC reference system rom
 hbmsx.com	CP/M MSX loader, standard build options
 rcmsx.com	CP/M MSX loader, customized build options
+msxrom.com	CP/M MSX ROM loader
 COMMAND.COM	MSX-DOS 1 command interpreter

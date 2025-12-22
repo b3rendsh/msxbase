@@ -7,6 +7,7 @@
 ; MSX100	Original MSX
 ; HBMSX		HBIOS MSX standard
 ; RCMSX		RCBUS customized options
+; MSXROM	MSX ROM loader
 
 ; Customization options
 ; ---------------------
@@ -16,7 +17,7 @@
 ; MSXKEY	Keyboard input:  0=con   1=msx keyboard
 ; MSXVDP	Screen output:   0=con   1=tms9918/v9938  2=con and tms9918/v9938
 ; MSXPSG	Sound/music:     0=off   1=ay-3-8910
-; MSXBOOT	Boot option:     0=basic 1=dos
+; MSXBOOT	Boot option:     0=basic 1=dos 2=rom
 ; DISKID	Disk unit        0=find first large disk
 
 IFDEF MSX100
@@ -61,6 +62,22 @@ IFDEF RCMSX
 	MSXBOOT	EQU	1
 	DISKID	EQU	0
 	INTHZ	EQU	60	; set equal to timer tick frequency: Z180=50 / TMS=60
+ENDIF
+
+; ROM loader settings
+IFDEF MSXROM
+	DEFINE	MSX1
+	DEFINE	HBIOS
+	MSXKEY	EQU	0
+	MSXVDP	EQU	1
+	VDP0	EQU	$98
+	VDP1	EQU	$99
+	MSXPSG	EQU	1
+	PSG0	EQU	$A0
+	PSG1	EQU	$A1
+	PSG2	EQU	$A2
+	MSXBOOT	EQU	2
+	INTHZ	EQU	60
 ENDIF
 
 ; BIOS/BASIC compile options

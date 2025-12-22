@@ -46,6 +46,10 @@ hbKeyIn:	push	bc
 		ld	c,CIO_CONSOLE
 		call	HB_INVOKE
 		ld	a,e			; character
+	IF MSXBOOT = 2
+		cp	KCTL_STOP		; CTRL+STOP ?
+		jp	z,SYNENT		; z=yes, reboot
+	ENDIF
 		or	a
 KeyInEnd:	pop	de
 		pop	bc
