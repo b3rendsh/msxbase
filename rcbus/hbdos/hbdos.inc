@@ -2,7 +2,7 @@
 ; hbdos.inc
 ; HBDOS / MSX constants and definitions
 ;
-; (C) 2025 All rights reserved.
+; (C) 2026 All rights reserved.
 ; ------------------------------------------------------------------------------
 
 		DEFINE	FAT16DOS1	; include FAT16
@@ -10,7 +10,7 @@
 
 FASTALLOC	equ	$01		; Cutoff free disk space count at 2048 free clusters
 
-SYSMAX		equ	$1A00		; Maximum size of RAM resident DOS code
+SYSMAX		equ	$1B00		; Maximum size of RAM resident DOS code (actual SysSize is in hbdos1.map)
 DOSFREE		equ	$E400		; Bottom of free variable memory for DOS (256-byte boundary)
 SYSBASE		equ	DOSFREE-SYSMAX	; Ram resident DOS code base address (256-byte page boundary, above TMPSTK)
 DISKBASE	equ	$4000		; Disk ROM kernel base address
@@ -180,9 +180,9 @@ M7D31		equ	$7D31		; BASIC ROM entry point for DOS
 DATABA		equ	$F1C9		; Start of disk system static work area
 SPRTBUF		equ	$F1C9		; BDOS function $09 STROUT
 BLKMOV		equ	$F1D9		; move block
+ENDJMP		equ	$F1E2		; warm boot / abort handler
 JPHL		equ	$F1E8		; start handler in DOS memory
 LODNAM		equ	$F1F4		; validate FCB filename
-ENDJMP		equ	$F1E2		; warm boot
 IONAME		equ	$F1F7		; device name table
 DEVDIR		equ	$F20B		; directory entry structure for devices
 MONTAB		equ	$F22B		; month table

@@ -2,7 +2,7 @@
 ; hbmsx.asm
 ; HBDOS MSX DOS/BASIC/ROM loader
 ;
-; (C) 2025 All rights reserved. 
+; (C) 2026 All rights reserved. 
 ; ------------------------------------------------------------------------------
 
 		INCLUDE "base.inc"
@@ -18,7 +18,7 @@ buff		equ	$80		; DMA buffer
 		jp	main
 
 		db	13,10
-		db	"HBDOS MSX V0.2",13,10
+		db	"HBDOS MSX V0.3",13,10
 		db	26
 
 msx:          	INCBIN	"obj/bios.bin"

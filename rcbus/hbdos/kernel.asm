@@ -2,7 +2,7 @@
 ; kernel.asm
 ; HBDOS RAM resident DOS kernel functions
 ;
-; (C) 2025 All rights reserved.
+; (C) 2026 All rights reserved.
 ; ------------------------------------------------------------------------------
 
 		; Used by main module
@@ -1022,7 +1022,7 @@ DiskError:	push	bc
 		pop	bc
 		cp	2
 		ret	nz
-		jp	WBOOT			; ENDJMP: warm boot
+		jp	ENDJMP			; warm boot (abort)
 
 ; ---------------------------------------------------------
 ; Function $30 WRABS

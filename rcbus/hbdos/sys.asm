@@ -2,7 +2,7 @@
 ; sys.asm
 ; HBDOS system module
 ;
-; (C) 2025 All rights reserved.
+; (C) 2026 All rights reserved.
 ; ------------------------------------------------------------------------------
 
 		INCLUDE "base.inc"
@@ -93,28 +93,10 @@ CHECKSUM:	dw	-1			; word checksum
 BATCHFLAG:	db	0			; batch file running flag
 		db	0			; cold boot flag (not used)
 
-; Messages part 1 of 2
-; Messages moved to unused space
+		defs	96,0			; space for temporary bank switching stack
+PH_STACK:	dw	0			; save old stack
 
-MsgTermBatch:	db	CR,LF
-		db	"Terminate batch file (Y/N)? "
-		db	"$"
-
-MsgInsertDos:	db	CR,LF
-		db	"Insert DOS disk and press any key..",CR,LF
-		db	"$"
-
-MsgBadFat:	db	CR,LF
-		db	"Bad FAT, drive "
-MsgDrive:	db	"A"
-		db	CR,LF
-		db	"$"
-
-MsgRead:	db	"read"
-
-MsgWrit:	db	"writ"
-
-		defs	128,0			; space for stack (at least 128 bytes)
+		defs	128,0			; space for BDOS stack (at least 128 bytes)
 		defs	SYSBASE+$100-$,0
 
 ; ------------------------------------------------------------------------------
@@ -221,7 +203,7 @@ XBDOS:		ld	a,1
 		ex	(sp),hl			; BDOS function handler
 		ret
 
-; simple Functions that only use register parameters are located in the disk bank
+; simple functions that only use register parameters are located in the disk bank
 @r01:		push	hl
 		pop	ix			; set function
 		ld	iy,(MASTER-1)		; set slot
@@ -234,6 +216,11 @@ XBDOS_DONE:	push	af
 		or	a			; CP/M function ?
 		jr	z,xbdos7		; z=no, quit
 		pop	af
+		
+		; CP/M compatible functions that have a data wrapper in msxdos.sys result in register b=0
+		; the other CP/M functions don't use b for output. Set b=0 for compatibility with MSX-DOS 1.
+		ld	b,0
+		
 		ld	l,a
 		ld	h,b			; result in hl, CP/M compatible
 		ld	sp,(SPSAVE)
@@ -243,7 +230,7 @@ xbdos7:		pop	af
 		ld	sp,(SPSAVE)
 		ret
 
-FNTAB:		dw	WBOOT			; 00
+FNTAB:		dw	Startup			; 00 don't use WBOOT to prevent switching to disk bank
 		dw	DOS_CONIN		; 01
 		dw	DOS_CONOUT		; 02
 		dw	DOS_READER		; 03
@@ -419,7 +406,25 @@ CommandM:	db	0
 		dw	0
 		dw	0
 
-; Messages part 2 of 2
+; Messages
+
+MsgTermBatch:	db	CR,LF
+		db	"Terminate batch file (Y/N)? "
+		db	"$"
+
+MsgInsertDos:	db	CR,LF
+		db	"Insert DOS disk and press any key..",CR,LF
+		db	"$"
+
+MsgBadFat:	db	CR,LF
+		db	"Bad FAT, drive "
+MsgDrive:	db	"A"
+		db	CR,LF
+		db	"$"
+
+MsgRead:	db	"read"
+
+MsgWrit:	db	"writ"
 
 MsgWrProtect:	db	CR,LF
 		db	"Write protect"
@@ -445,7 +450,6 @@ MsgError2:	db	"A"
 
 MsgAbort:	db	"Abort, Retry or Ignore? "
 		db	"$"
-
 
 ; ---------------------------------------------------------
 ; *** Custom HBIOS RAM resident paging helper routines ***
@@ -500,7 +504,7 @@ PH_XFER:	call	HB_ENARAM
 ; Map MSX slot routines to HBIOS bank switching for compatiblity
 ; Note: HBIOS bank switching helper routines are faster
 ; ---------------------------------------------------------
-		
+
 PH_RDSLT:	di
 		bit	7,h
 		jr	z,read_bank
@@ -561,14 +565,21 @@ PH_CALSLT:	di
 		push	hl
 		push	ix
 		pop	hl
-		bit	7,h
+		bit	7,h			; routine in lower memory?
 		pop	hl
-		jp	z,call_bank
+		jp	z,call_bank		; z=yes, switch bank first
 		pop	af
 jpix:		jp	(ix)
 		
-call_bank:	pop	af
-		ex	af,af'
+call_bank:	push	hl
+		ld	hl,0
+		add	hl,sp
+		bit	7,h			; sp in lower memory?
+		pop	hl
+		jr	z,call_bank2		; z=yes, use temporary stack
+		pop	af
+		
+call_bank1:	ex	af,af'
 		push	bc
 		push	iy
 		pop	bc
@@ -587,6 +598,14 @@ call_bank:	pop	af
 		di
 		call	HB_BNKSEL
 		ex	af,af'
+		ret
+
+; use temporary stack to support caller sp in lower memory
+call_bank2:	pop	af
+		ld	(PH_STACK),sp
+		ld	sp,PH_STACK
+		call	call_bank1
+		ld	sp,(PH_STACK)
 		ret
 
 PH_ENASLT:	di
