@@ -22,7 +22,7 @@ endif
 BASE := ../base
 
 
-all:	msx100 hbmsx rcmsx msxrom
+all:	msx100 hbmsx rcmsx hbrom rcrom
 
 rdate:
 	@echo db $(QUOTE)$(shell $(GETDATE))$(QUOTE) > rdate.inc
@@ -57,14 +57,22 @@ rcmsx:	rdate
 	$(CP) obj$/rcmsx.com bin$/rcmsx.com
 	@echo done
 	
-msxrom:	rdate
-	@echo Assembling MSX ROM loader
-	z80asm -I$(BASE) -DMSXROM -b -l -m -Oobj -o=bios.bin bios.asm
-	z80asm -I$(BASE) -DMSXROM -b -l -m -Oobj -o=init.bin basic.asm
-	z80asm -I$(BASE) -DMSXROM -b -l -m -Oobj hbmsx.asm -o=msxrom.com
-	$(CP) obj$/msxrom.com bin$/msxrom.com
+hbrom:	rdate
+	@echo Assembling MSX ROM loader standard settings
+	z80asm -I$(BASE) -DHBROM -b -l -m -Oobj -o=bios.bin bios.asm
+	z80asm -I$(BASE) -DHBROM -b -l -m -Oobj -o=init.bin basic.asm
+	z80asm -I$(BASE) -DHBROM -b -l -m -Oobj hbmsx.asm -o=hbrom.com
+	$(CP) obj$/hbrom.com bin$/hbrom.com
 	@echo done
 
+rcrom:	rdate
+	@echo Assembling MSX ROM loader customized settings
+	z80asm -I$(BASE) -DRCROM -b -l -m -Oobj -o=bios.bin bios.asm
+	z80asm -I$(BASE) -DRCROM -b -l -m -Oobj -o=init.bin basic.asm
+	z80asm -I$(BASE) -DRCROM -b -l -m -Oobj hbmsx.asm -o=rcrom.com
+	$(CP) obj$/rcrom.com bin$/rcrom.com
+	@echo done
+	
 clean:
 	$(RMF) obj$(RMD)
 

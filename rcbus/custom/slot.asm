@@ -25,10 +25,6 @@
 ; therefore the HBIOS memory routines can be invoked without using MSX mutex.
 ; ------------------------------------------------------------------------------
 
-		ALIGN	018CH
-
- 		; this area is reserved for extra routines
-		
 ; ---------------------------------------------------------
 ; Read the value of an address in another slot
 ; Input:  A  = slot number

@@ -263,6 +263,13 @@ CHAR_16:	defb	0,0
 		jp	NWRVRM
 	ENDIF
 
+	IFDEF HBIOS
+		ALIGN	018CH
+
+		; this jump table area is reserved for extra routines
+A018C: 		jp	hbCharOut		; HBCHPUT
+	ENDIF
+	
 ; ------------------------------------------------------------------------------
 ; SLOT.MAC
 ; BIOS slot functions

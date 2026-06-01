@@ -23,9 +23,13 @@ Prebuilt binaries with default options are available in the bin folder.
 
 Copy COMMAND.COM to the root directory of the first FAT12/FAT16 partition on the disk.
 
-Start hbmsx.com or rcmsx.com from RomWBW CP/M to load HBDOS / Disk BASIC.
+Start hbmsx or rcmsx from RomWBW CP/M to load HBDOS / Disk BASIC.
 
-Start msxrom.com from RomWBW CP/M to load a MSX (game) ROM image e.g. "msxrom arkanoid.rom".
+Start hbrom or rcrom from RomWBW CP/M to load a MSX (game) ROM image e.g. "rcrom arkanoid.rom".
+
+Type "rcmsx /?" for additional options.
+
+Note: hbmsx/hbrom uses the MSX keyboard and rcmsx/rcrom uses the console for input.
 
 ## HBDOS
 

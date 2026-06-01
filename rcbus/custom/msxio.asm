@@ -2,7 +2,7 @@
 ; msxio.asm
 ; Custom MSX HBIOS I/O functions, MSX 1 version
 ;
-; (C) 2025 All rights reserved.
+; (C) 2026 All rights reserved.
 ; ------------------------------------------------------------------------------
 
 ; ----------------------------------------------------------
@@ -59,7 +59,7 @@ KeyInEnd:	pop	de
 CHARBUF:	db	0			; key buffer
 
 ; ----------------------------------------------------------
-; Character output HBIOS console
+; HBCHPUT - Character output HBIOS console
 ; Input:  A = character
 ; Remark: errors are ignored, uses mutex to disable keyint
 ; ----------------------------------------------------------
@@ -1156,7 +1156,7 @@ A08BC:		push	hl
 		push	bc
 		push	af			; store character
 	IF HBIOS && (MSXVDP != 1)
-		call	hbCharOut
+		call	HBCHPUT
 	ELSE
 		SYSHOOK	H_CHPU			; hook character to display
 	ENDIF
@@ -2140,7 +2140,7 @@ A10F9:		push	hl			; store BASIC pointer
 ; Subroutine WRTPSG (write PSG register)
 WRTPSG:
 A1102:		di				; disable maskable interrupts (make sure PSG register does not change)
-	IFDEF HBIOS 
+	IF HBIOS && (MSXJOY != 1)
 		push	af
 		call	hbSoundOut
 		defs	1109H-$,0		; address alignment
@@ -2161,8 +2161,7 @@ A110C:		ld	a,14
 ; Subroutine RDPSG (read PSG register)
 RDPSG:
 A110E:	
-	IFDEF HBIOS
-		; todo: GPIO port support
+	IF HBIOS && (MSXJOY != 1)
 		ld	a,0FFH
 		ret
 		defs	1113H-$,0
@@ -2355,7 +2354,7 @@ A120C:		ld	b,a			; store joystick port
 A121B:		and	10101111B
 		or	00000011B
 A121F:		
-	IFDEF HBIOS
+	IF HBIOS && (MSXJOY != 1)
 		nop
 		nop
 	ELSE
@@ -2418,7 +2417,7 @@ A126C:		call	A1226			; read keyboard row 8
 ; Subroutine GTPDL (read paddle)
 GTPDL:
 A1273:		
-	IFDEF HBIOS
+	IF HBIOS && (MSXJOY != 1)
 		; paddle not supported
 		xor	a
 		ret
@@ -2489,7 +2488,7 @@ A12C5:		push	af			; store touchpad function
 		call	RDPSG			; read PSG register
 		and	10111111B		; clear port bit
 		or	c
-	IFDEF HBIOS
+	IF HBIOS && (MSXJOY != 1)
 		; touchpad not supported
 		nop
 		nop
@@ -2612,7 +2611,7 @@ A136D:		push	hl
 		and	d			; clear bits
 		ld	d,a			; OR mask
 		ld	a,15			; register = IOB
-	IFDEF HBIOS
+	IF HBIOS && (MSXJOY != 1)
 		; not supported
 		nop
 		nop
@@ -2625,7 +2624,7 @@ A136D:		push	hl
 		and	l			; clear pulse and pin 6/7 bits of port
 		or	d			; set pulse and pin 6/7 bits of port
 		or	h			; set pin 6/7 bits of other port to 1
-	IFDEF HBIOS
+	IF HBIOS && (MSXJOY != 1)
 		nop
 		nop
 	ELSE

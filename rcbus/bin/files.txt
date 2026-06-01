@@ -3,7 +3,8 @@ https://github.com/b3rendsh/msxbase
 
 Files:
 msx1_base.img	MSX1 BIOS/BASIC reference system rom
-hbmsx.com	CP/M MSX loader, standard build options
-rcmsx.com	CP/M MSX loader, customized build options
-msxrom.com	CP/M MSX ROM loader
+hbmsx.com	CP/M MSX system loader, MSX standard build options
+rcmsx.com	CP/M MSX system loader, RCBUS custom build options
+hbrom.com	CP/M MSX ROM loader, MSX standard build option
+rcmsx.com	CP/M MSX ROM loader, RCBUS custom build options
 COMMAND.COM	MSX-DOS 1 command interpreter

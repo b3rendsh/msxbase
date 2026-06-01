@@ -7,7 +7,8 @@
 ; MSX100	Original MSX
 ; HBMSX		HBIOS MSX standard
 ; RCMSX		RCBUS customized options
-; MSXROM	MSX ROM loader
+; HBROM		MSX ROM loader MSX standard
+; RCROM		MSX ROM loader customized options
 
 ; Customization options
 ; ---------------------
@@ -17,17 +18,22 @@
 ; MSXKEY	Keyboard input:  0=con   1=msx keyboard
 ; MSXVDP	Screen output:   0=con   1=tms9918/v9938  2=con and tms9918/v9938
 ; MSXPSG	Sound/music:     0=off   1=ay-3-8910
+; MSXJOY	Joystick ports:  0=off   1=on (use standard MSX PSG I/O ports)
 ; MSXBOOT	Boot option:     0=basic 1=dos 2=rom
 ; DISKID	Disk unit        0=find first large disk
 
+; Default settings
+; The RomWBW MSX loader compares the defaults with the settings that HBIOS reports,
+; if they are not the same then the system ROM is patched with the HBIOS settings.
+INTHZ	EQU	50
+VDP0	EQU	$98
+VDP1	EQU	$99
+PSG0	EQU	$A0
+PSG1	EQU	$A1
+PSG2	EQU	$A2
+
 IFDEF MSX100
 	DEFINE	MSX1
-	VDP0	EQU	$98
-	VDP1	EQU	$99
-	PSG0	EQU	$A0
-	PSG1	EQU	$A1
-	PSG2	EQU	$A2
-	INTHZ	EQU	50
 ENDIF
 
 ; Standard settings
@@ -36,15 +42,10 @@ IFDEF HBMSX
 	DEFINE	HBIOS
 	MSXKEY	EQU	1
 	MSXVDP	EQU	1
-	VDP0	EQU	$98
-	VDP1	EQU	$99
 	MSXPSG	EQU	1
-	PSG0	EQU	$A0
-	PSG1	EQU	$A1
-	PSG2	EQU	$A2
+	MSXJOY	EQU	1
 	MSXBOOT	EQU	1
 	DISKID	EQU	0
-	INTHZ	EQU	50
 ENDIF
 
 ; Customized settings
@@ -52,32 +53,33 @@ IFDEF RCMSX
 	DEFINE	MSX1
 	DEFINE	HBIOS
 	MSXKEY	EQU	0
-	MSXVDP	EQU	2	; must be 1 or 2
-	VDP0	EQU	$98	; $BE, $40
-	VDP1	EQU	$99	; $BF, $41
+	MSXVDP	EQU	1		; must be 1 or 2
 	MSXPSG	EQU	1
-	PSG0	EQU	$A0
-	PSG1	EQU	$A1
-	PSG2	EQU	$A2
+	MSXJOY	EQU	0
 	MSXBOOT	EQU	1
 	DISKID	EQU	0
-	INTHZ	EQU	60	; set equal to timer tick frequency: Z180=50 / TMS=60
 ENDIF
 
-; ROM loader settings
-IFDEF MSXROM
+; ROM loader standard settings
+IFDEF HBROM
+	DEFINE	MSX1
+	DEFINE	HBIOS
+	MSXKEY	EQU	1
+	MSXVDP	EQU	1
+	MSXPSG	EQU	1
+	MSXJOY	EQU	1
+	MSXBOOT	EQU	2
+ENDIF
+
+; ROM loader customized settings
+IFDEF RCROM
 	DEFINE	MSX1
 	DEFINE	HBIOS
 	MSXKEY	EQU	0
-	MSXVDP	EQU	1
-	VDP0	EQU	$98
-	VDP1	EQU	$99
+	MSXVDP	EQU	1		; must be 1
 	MSXPSG	EQU	1
-	PSG0	EQU	$A0
-	PSG1	EQU	$A1
-	PSG2	EQU	$A2
+	MSXJOY	EQU	0
 	MSXBOOT	EQU	2
-	INTHZ	EQU	60
 ENDIF
 
 ; BIOS/BASIC compile options

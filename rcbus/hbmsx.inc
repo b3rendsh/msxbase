@@ -21,6 +21,10 @@ BF_RTCSETTIM		equ	$21		; set time
 
 BF_SYSRES_COLD		equ	$02		; cold start
 
+BF_VDADEV		equ	$43		; VDA device info
+
+BF_SNDQUERY		equ	$55		; SND device query (subfunction in e)
+
 BF_SYSRESET		equ	$f0		; soft reset HBIOS
 BF_SYSSETBNK		equ	$f2		; set current bank
 BF_SYSPEEK		equ	$fa		; get a byte value from alt bank
@@ -38,6 +42,8 @@ HB_INVOKE		equ	$fff0		; invoke HBIOS function
 HB_BNKSEL		equ	$fff3		; select low memory bank id
 HB_BNKCALL		equ	$fff9		; interbank function call
 HB_IDENT		equ	$fffc		; pointer to HBIOS ident data block
+
+HBCHPUT			equ	$018c		; MSX BIOS jump table entry for output to HBIOS console
 
 MSX_KEYINT		equ	$0c3c		; MSX BIOS interrupt handler
 MSX_DOS			equ	$8000		; MSX HBDOS loader
